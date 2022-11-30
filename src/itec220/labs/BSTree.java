@@ -44,58 +44,148 @@ public class BSTree <Key extends Comparable<Key>, Value> implements BinarySearch
 		 public Node leftChild;
 	}
 	
+	private Value recursiveFind(Node current, Key key) {
+		if(current == null) {
+			return null;
+		}
+		
+		int compare = comparator.compare(key, current.key);
+		if(compare == 0) {
+			return current.data;
+		}
+		else if(compare < 0) {
+			return recursiveFind(current.leftChild, key);
+		}
+		else {
+			return recursiveFind(current.rightChild, key);
+		}
+	}
 	 
 	public Value findRecursively(Key key) {
-		
-		fail("Not yet implemented");
-		return null;
+		return recursiveFind(root, key);
 	}
 	 
 	private Value findIteratively(Key key) {
+		Node current = root;
 		
-		fail("Not yet implemented");
+		while(current != null) {
+			int compare = comparator.compare(key, current.key);
+			if(compare == 0) {
+				return current.data;
+			}
+			else if (compare < 0) {
+				current = current.leftChild;
+			}
+			else {
+				current = current.rightChild;
+			}
+		}
+		
+		return (current != null) ? current.data : null;
+	}
+	
+	private Node findParent(Key key) {
+		Node current = root;
+		
+		//while have child
+		while(current.leftChild != null || current.rightChild != null) {
+			if(current.leftChild != null) {
+				if(comparator.compare(key, current.leftChild.key) == 0) {
+					return current;
+				}
+			}
+			if(current.rightChild != null) {
+				if(comparator.compare(key, current.rightChild.key) == 0) {
+					return current;
+				}
+			}
+			
+			if(comparator.compare(key, current.key) < 0) {
+				current = current.leftChild;
+			}
+			else {
+				current = current.rightChild;
+			}
+		}
+		
 		return null;
+	}
+	
+	private Node findFutureParent(Key key) {
+		Node current = root;
+		
+		while(current.leftChild != null || current.rightChild != null) {
+			
+			if(comparator.compare(key, current.key) < 0) {
+				if(current.leftChild != null) {
+					current = current.leftChild;
+				}
+				else {
+					return current;
+				}
+			}
+			else {
+				if(current.rightChild != null) {
+					current = current.rightChild;
+				}
+				else {
+					return current;
+				}
+			}
+		}
+		
+		return current;
 	}
 	 
 	
 	@Override
 	public boolean insert(Key key, Value value) {
-	
-		// call another method top insert
-		fail("Not yet implemented");
-		return false;
-
+		if(isEmpty()) {
+			root = new Node(key, value);
+		}
+		else if(contains(key)) {
+			return false;
+		}
+		else {
+			Node parent = findFutureParent(key);
+			
+			if(comparator.compare(key, parent.key) < 0) {
+				parent.leftChild = new Node(key, value);
+			}
+			else {
+				parent.rightChild = new Node(key, value);
+			}
+		}
+		
+		size++;
+		return true;
 	}
 	@Override
 	public void printTree(Traversal order) {
+		ArrayList<Value> list = values(order);
 		
-	// If only I had a method that got a list of the different traversals...
-	fail("Not yet implemented");
-		
+		list.forEach(System.out::println);
 	}
 	
 	@Override
 	public void clear() {
-		fail("Not yet implemented");
+		size = 0;
+		root = null;
 	}
 	
 
 	public boolean isEmpty()
 	{
-		fail("Not yet implemented");
-		return false;
+		return (size == 0 && root == null);
 	}
 	@Override
 	public int size() {
-		fail("Not yet implemented");
-		return 0;
+		return size;
 	}
 
 	@Override
 	public boolean contains(Key key) {
-		fail("Not yet implemented");		
-		return false;		
-	
+		return (find(key) != null);
 	}
 
 	
@@ -105,17 +195,54 @@ public class BSTree <Key extends Comparable<Key>, Value> implements BinarySearch
 		return null;
 	}
 	
-	@Override
-	public ArrayList<Value> values(Traversal order) {
-		
-		fail("Not yet implemented");
-		return null;
-	}
+    private void inOrder(Node current, ArrayList<Value> list) {
+        if(current != null) {
+            inOrder(current.leftChild, list);
+            list.add(current.data);
+            inOrder(current.rightChild, list);
+        }
+    }
+    
+    private void postOrder(Node current, ArrayList<Value> list) {
+        if(current != null) {
+            postOrder(current.leftChild, list);
+            postOrder(current.rightChild, list);
+            list.add(current.data);
+        }
+    }
+    
+    private void preOrder(Node current, ArrayList<Value> list) {
+        if(current != null) {
+            list.add(current.data);
+            preOrder(current.leftChild, list);
+            preOrder(current.rightChild, list);
+        }
+    }
+    
+    @Override
+    public ArrayList<Value> values(Traversal order) {
+        ArrayList<Value> list = new ArrayList<>();
+        
+        switch(order) {
+        case IN_ORDER:
+            inOrder(root, list);
+            break;
+        case POST_ORDER:
+            postOrder(root, list);
+            break;
+        case PRE_ORDER:
+            preOrder(root, list);
+            break;
+        default:
+            break;
+        }
+        
+        return list;
+    }
+
 	@Override
 	public Value find(Key key) {
-		
-		fail("Not yet implemented");
-		return null;
+		return findRecursively(key);
 	}	
 	
 
