@@ -136,6 +136,12 @@ public class BSTree <Key extends Comparable<Key>, Value> implements BinarySearch
 		
 		return current;
 	}
+	
+	private Node findNode(Key key) {
+		Node parent = findParent(key);
+		
+		return (parent.leftChild.key.equals(key)) ? parent.leftChild : parent.rightChild;
+	}
 	 
 	
 	@Override
@@ -187,12 +193,81 @@ public class BSTree <Key extends Comparable<Key>, Value> implements BinarySearch
 	public boolean contains(Key key) {
 		return (find(key) != null);
 	}
+	
+	private Node findMinimum(Node original) {
+		while(original.leftChild != null) {
+			original = original.leftChild;
+		}
+		
+		return original;
+	}
 
+	private Node findSuccessor(Node original) {
+		if(original.rightChild != null) {
+			return findMinimum(original.rightChild);
+		}
+		
+		Node parent = findParent(original.key);
+		
+		while(parent != null && original.equals(parent.rightChild)) {
+			original = parent;
+			parent = findParent(parent.key);
+		}
+		
+		return parent;
+	}
+	
+	private void shiftNodes(Node original, Node replacement) {
+		Node origParent = findParent(original.key);
+		
+		//replace root
+		if(origParent == null) {
+			root = replacement;
+		}
+		else if(origParent.key.equals(original.key)) {
+			origParent.leftChild = replacement;
+		}
+		else {
+			origParent.rightChild = replacement;
+		}
+	}
 	
 	public Value remove(Key key) {
-		// Complete for Programming Assignment 3
-		fail("Not yet implemented");
-		return null;
+		if(isEmpty() || !contains(key)) {
+			return null;
+		}
+		
+		Node current = findNode(key);
+		Node successor;
+		
+		Value data = current.data;
+		
+		//I had found this algorithm for removal from the book Introduction to Algorithms,  0-262-03293-7
+		//I had already written this a had it working, but for some reason I have no backup of it on Github and have managed to 
+		//somehow delete any trace of it
+		
+		if(current.leftChild == null) {
+			shiftNodes(current, current.leftChild);
+		}
+		else if(current.rightChild == null) {
+			shiftNodes(current, current.rightChild);
+		}
+		else {
+			successor = findSuccessor(current);
+			
+			Node successorParent = findParent(successor.key);
+			
+			if(!successorParent.key.equals(current.key)) {
+				shiftNodes(successor, successor.rightChild);
+				successor.rightChild = current.rightChild;
+			}
+			
+			shiftNodes(current, successor);
+			successor.leftChild = current.leftChild;
+		}
+		
+		size--;
+		return data;
 	}
 	
     private void inOrder(Node current, ArrayList<Value> list) {
