@@ -84,6 +84,25 @@ public class BSTree <Key extends Comparable<Key>, Value> implements BinarySearch
 		return (current != null) ? current.data : null;
 	}
 	
+	private Node findNode(Key key) {
+		Node current = root;
+		
+		while(current != null) {
+			int compare = comparator.compare(key, current.key);
+			if(compare == 0) {
+				return current;
+			}
+			else if (compare < 0) {
+				current = current.leftChild;
+			}
+			else {
+				current = current.rightChild;
+			}
+		}
+		
+		return (current != null) ? current : null;
+	}
+	
 	private Node findParent(Key key) {
 		Node current = root;
 		
@@ -143,6 +162,7 @@ public class BSTree <Key extends Comparable<Key>, Value> implements BinarySearch
 		return (parent.leftChild.key.equals(key)) ? parent.leftChild : parent.rightChild;
 	}
 	 
+	
 	
 	@Override
 	public boolean insert(Key key, Value value) {
@@ -233,11 +253,16 @@ public class BSTree <Key extends Comparable<Key>, Value> implements BinarySearch
 	}
 	
 	public Value remove(Key key) {
+<<<<<<< HEAD
 		if(isEmpty() || !contains(key)) {
+=======
+		if(size == 0) {
+>>>>>>> 16263f2b5f2c1b4fc5c1f842227e74a242adbd38
 			return null;
 		}
 		
 		Node current = findNode(key);
+<<<<<<< HEAD
 		Node successor;
 		
 		Value data = current.data;
@@ -264,10 +289,44 @@ public class BSTree <Key extends Comparable<Key>, Value> implements BinarySearch
 			
 			shiftNodes(current, successor);
 			successor.leftChild = current.leftChild;
+=======
+		Node currentParent = findParent(key);
+		Value data = current.data;
+		
+		//no children
+		if(current.leftChild == null && current.rightChild == null) {
+			current = null;
+		}
+		//1 child
+		else if (current.leftChild != null ^ current.rightChild != null) {
+			if(current.leftChild != null) {
+				current = current.leftChild;
+				
+			}
+			else {
+				current = current.rightChild;
+			}
+			
+			//set parent to point to new current
+			if(comparator.compare(key, currentParent.key) < 0) {
+				currentParent.leftChild = current;
+			}
+			else {
+				currentParent.rightChild = current;
+			}
+		}
+		//2 children
+		else {
+			
+>>>>>>> 16263f2b5f2c1b4fc5c1f842227e74a242adbd38
 		}
 		
 		size--;
 		return data;
+<<<<<<< HEAD
+=======
+		
+>>>>>>> 16263f2b5f2c1b4fc5c1f842227e74a242adbd38
 	}
 	
     private void inOrder(Node current, ArrayList<Value> list) {
@@ -294,6 +353,22 @@ public class BSTree <Key extends Comparable<Key>, Value> implements BinarySearch
         }
     }
     
+	private void levelOrder(Node root, ArrayList<Value> list) {
+		QueueList<Node> queue = new QueueList<>();
+		queue.enqueue(root);
+		
+		while(!queue.isEmpty()) {
+			Node current = queue.dequeue();
+			
+			if(current != null) {
+				list.add(current.data);
+
+				queue.enqueue(current.leftChild);
+				queue.enqueue(current.rightChild);
+			}
+		}
+	}
+    
     @Override
     public ArrayList<Value> values(Traversal order) {
         ArrayList<Value> list = new ArrayList<>();
@@ -308,6 +383,8 @@ public class BSTree <Key extends Comparable<Key>, Value> implements BinarySearch
         case PRE_ORDER:
             preOrder(root, list);
             break;
+        case LEVEL_ORDER:
+        	levelOrder(root, list);
         default:
             break;
         }

@@ -89,8 +89,23 @@ class TestBSTDefaultTraversal {
 		ArrayList<Integer> preOrderActual = defaultNumberTree.values(BinarySearchTree.Traversal.PRE_ORDER);
 		// Assert
 		assertEquals(preOrderNumberList, preOrderActual);
-		
+	}
 	
+	/**
+	 *Tree inserted in this order should look like:
+	 *                                        50
+	 *                               25                75
+	 *                           15      35        65      85       
+	 *                          5  20  30  45    60  70  80  95          
+	 */
+	
+	@Test 
+	void testLevelTraversal() {
+		ArrayList<Integer> levelOrderNumberList = new ArrayList<Integer>(Arrays.asList(50, 25, 75, 15, 35, 65, 85, 5, 20, 30, 45, 60, 70, 80, 95));
+
+		ArrayList<Integer> levelOrderActual = defaultNumberTree.values(BinarySearchTree.Traversal.LEVEL_ORDER);
+		
+		assertEquals(levelOrderNumberList, levelOrderActual);
 	}
 
 }

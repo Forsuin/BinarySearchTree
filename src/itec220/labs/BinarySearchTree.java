@@ -6,8 +6,7 @@ public interface BinarySearchTree <Key extends Comparable<Key>, Value> {
 
 	
 	public enum Traversal {
-		IN_ORDER, PRE_ORDER, POST_ORDER
-
+		IN_ORDER, PRE_ORDER, POST_ORDER, LEVEL_ORDER
 	}
 	
 	/**
