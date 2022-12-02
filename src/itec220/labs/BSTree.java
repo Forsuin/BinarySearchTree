@@ -84,25 +84,6 @@ public class BSTree <Key extends Comparable<Key>, Value> implements BinarySearch
 		return (current != null) ? current.data : null;
 	}
 	
-	private Node findNode(Key key) {
-		Node current = root;
-		
-		while(current != null) {
-			int compare = comparator.compare(key, current.key);
-			if(compare == 0) {
-				return current;
-			}
-			else if (compare < 0) {
-				current = current.leftChild;
-			}
-			else {
-				current = current.rightChild;
-			}
-		}
-		
-		return (current != null) ? current : null;
-	}
-	
 	private Node findParent(Key key) {
 		Node current = root;
 		
@@ -157,7 +138,15 @@ public class BSTree <Key extends Comparable<Key>, Value> implements BinarySearch
 	}
 	
 	private Node findNode(Key key) {
+		if(key.equals(root.key)) {
+			return root;
+		}
+		
 		Node parent = findParent(key);
+		
+		if(parent == null) {
+			return null;
+		}
 		
 		return (parent.leftChild.key.equals(key)) ? parent.leftChild : parent.rightChild;
 	}
@@ -237,96 +226,89 @@ public class BSTree <Key extends Comparable<Key>, Value> implements BinarySearch
 		return parent;
 	}
 	
-	private void shiftNodes(Node original, Node replacement) {
-		Node origParent = findParent(original.key);
+	private void replaceNode(Node original, Node child) {
+		Node parent = findParent(original.key);
 		
-		//replace root
-		if(origParent == null) {
-			root = replacement;
-		}
-		else if(origParent.key.equals(original.key)) {
-			origParent.leftChild = replacement;
+		if(parent.leftChild.key.equals(original.key)) {
+			parent.leftChild = child;
 		}
 		else {
-			origParent.rightChild = replacement;
+			parent.rightChild = child;
 		}
 	}
 	
 	public Value remove(Key key) {
-<<<<<<< HEAD
-		if(isEmpty() || !contains(key)) {
-=======
-		if(size == 0) {
->>>>>>> 16263f2b5f2c1b4fc5c1f842227e74a242adbd38
+		if(isEmpty()) {
 			return null;
 		}
 		
 		Node current = findNode(key);
-<<<<<<< HEAD
-		Node successor;
 		
 		Value data = current.data;
 		
-		//I had found this algorithm for removal from the book Introduction to Algorithms,  0-262-03293-7
-		//I had already written this a had it working, but for some reason I have no backup of it on Github and have managed to 
-		//somehow delete any trace of it
+		Node parent = findParent(current.key);
 		
-		if(current.leftChild == null) {
-			shiftNodes(current, current.leftChild);
+		//No children
+		if(current.leftChild == null & current.rightChild == null) {
+			if(root.equals(current)) {
+				root = null;
+			}
+			else {
+				
+				if(parent.leftChild.equals(current)) {
+					parent.leftChild = null;
+				}
+				else {
+					parent.rightChild = null;
+				}
+				
+				current = null;
+			}
 		}
-		else if(current.rightChild == null) {
-			shiftNodes(current, current.rightChild);
+		//one child
+		else if(current.leftChild != null ^ current.rightChild != null) {
+			if(current.leftChild != null) {
+				if(parent.leftChild.key.equals(current.key)) {
+					parent.leftChild = current.leftChild;
+				}
+				else {
+					parent.rightChild = current.leftChild;
+				}
+			}
+			else {
+				if(parent.leftChild.key.equals(current.key)) {
+					parent.leftChild = current.rightChild;
+				}
+				else {
+					parent.rightChild = current.rightChild;
+				}
+			}
 		}
+		//two children
 		else {
-			successor = findSuccessor(current);
-			
+			Node successor = findSuccessor(current);
 			Node successorParent = findParent(successor.key);
 			
-			if(!successorParent.key.equals(current.key)) {
-				shiftNodes(successor, successor.rightChild);
+			if(!successorParent.equals(current)) {
+				replaceNode(successor, successor.rightChild);
+				
 				successor.rightChild = current.rightChild;
 			}
+			if(parent == null) {
+				root = successor;
+			}
+			else if(parent.leftChild.key.equals(current.key)) {
+				parent.leftChild = successor;
+			}
+			else {
+				parent.rightChild = successor;
+			}
 			
-			shiftNodes(current, successor);
 			successor.leftChild = current.leftChild;
-=======
-		Node currentParent = findParent(key);
-		Value data = current.data;
-		
-		//no children
-		if(current.leftChild == null && current.rightChild == null) {
-			current = null;
-		}
-		//1 child
-		else if (current.leftChild != null ^ current.rightChild != null) {
-			if(current.leftChild != null) {
-				current = current.leftChild;
-				
-			}
-			else {
-				current = current.rightChild;
-			}
-			
-			//set parent to point to new current
-			if(comparator.compare(key, currentParent.key) < 0) {
-				currentParent.leftChild = current;
-			}
-			else {
-				currentParent.rightChild = current;
-			}
-		}
-		//2 children
-		else {
-			
->>>>>>> 16263f2b5f2c1b4fc5c1f842227e74a242adbd38
 		}
 		
 		size--;
 		return data;
-<<<<<<< HEAD
-=======
-		
->>>>>>> 16263f2b5f2c1b4fc5c1f842227e74a242adbd38
 	}
 	
     private void inOrder(Node current, ArrayList<Value> list) {

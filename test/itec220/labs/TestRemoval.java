@@ -133,5 +133,55 @@ class TestBSTRemove {
 				  () -> assertFalse(singleTestNumberTree.contains(1), "Contains: ")
 				);
 	}
+	
+	@Test
+	void removeSingleChildNode() {
+		int fullSize = singleTestNumberTree.size();
+		
+		Integer removed = singleTestNumberTree.remove(8);
+		
+		ArrayList<Integer> testList = defaultNumberList;
+		testList.set(3, 5);
+		testList.remove(7);
+		
+		
+		assertAll(() -> assertEquals(fullSize - 1, singleTestNumberTree.size()),
+				  () -> assertFalse(singleTestNumberTree.contains(8)),
+				  () -> assertEquals(8, removed),
+				  () -> assertEquals(testList, singleTestNumberTree.values(Traversal.LEVEL_ORDER))
+				);
+	}
+	
+	@Test
+	void removeMiddleLeaf() {
+		Integer removed = singleTestNumberTree.remove(40);
+		
+		ArrayList<Integer> testList = defaultNumberList;
+		testList.remove(9);
+		
+		assertAll(() -> assertEquals(defaultNumberList.size(), singleTestNumberTree.size(), "Size: "),
+				  () -> assertFalse(singleTestNumberTree.isEmpty()),
+				  () -> assertEquals(testList, singleTestNumberTree.values(Traversal.LEVEL_ORDER)),
+				  () -> assertEquals(40, removed, "Removed: "),
+				  () -> assertFalse(singleTestNumberTree.contains(40), "Contains Element: ")
+				  );
+	}
+	
+	@Test
+	void removeDoubleChild() {
+		Integer removed = singleTestNumberTree.remove(55);
+		
+		ArrayList<Integer> testList = defaultNumberList;
+		testList.set(2, 56);
+		testList.remove(testList.size() - 1);
+
+		
+		assertAll(() -> assertEquals(defaultNumberList.size(), singleTestNumberTree.size(), "Size: "),
+				  () -> assertFalse(singleTestNumberTree.isEmpty()),
+				  () -> assertEquals(testList, singleTestNumberTree.values(Traversal.LEVEL_ORDER)),
+				  () -> assertEquals(55, removed, "Removed: "),
+				  () -> assertFalse(singleTestNumberTree.contains(55), "Contains Element: ")
+				  );
+	}
 
 }
